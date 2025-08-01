@@ -12,7 +12,7 @@ public class MeterReadingController : ControllerBase
     [HttpPost("meter-reading-uploads")]
     public async Task<ActionResult<LoadResults>> Post([FromBody] string? fileLocation)
     {
-        fileLocation ??= $@"{Directory.GetParent(Directory.GetCurrentDirectory())!.FullName}\TestFiles\meter-reading.csv";
+        fileLocation ??= $@"{Directory.GetCurrentDirectory()}\TestFiles\meter-reading.csv";
         
         var successCount = 3;
         var failureCount = 6;

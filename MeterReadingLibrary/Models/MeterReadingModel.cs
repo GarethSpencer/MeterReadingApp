@@ -1,9 +1,9 @@
 ﻿namespace MeterReadingLibrary.Models;
 
-internal class MeterReadingModel
+public class MeterReadingModel
 {
     public int MeterReadingId { get; set; }
     public int AccountId { get; set; }
-    public DateTime MeterReadingDate { get; set; }
-    public int MeterReadingValue { get; set; }
+    public DateTime ReadingDate { get; set; }
+    public int ReadingValue { get; set; }
 }
