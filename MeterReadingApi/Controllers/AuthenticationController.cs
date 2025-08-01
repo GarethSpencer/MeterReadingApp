@@ -21,6 +21,7 @@ public class AuthenticationController : ControllerBase
     public record AuthenticationData(string? UserName, string? Password);
     public record UserData(int Id, string UserName);
 
+    // POST api/Authentication/token
     [HttpPost("token")]
     [AllowAnonymous]
     public ActionResult<string> Authenticate([FromBody] AuthenticationData data)
@@ -61,9 +62,9 @@ public class AuthenticationController : ControllerBase
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
 
-    // NON PRODUCTION VALIDATIONS: Replace this with a call to an auth system (e.g. Auth0)
     private static UserData? ValidateCredentials(AuthenticationData data)
     {
+        // NON PRODUCTION VALIDATIONS: Replace this with a call to an auth system (e.g. Auth0)
         if (CompareValues(data.UserName, "ensek") &&
             CompareValues(data.Password, "Test1!"))
         {

@@ -44,11 +44,11 @@ public class StoredProcedureRunner : IStoredProcedureRunner
             _connectionStringName);
     }
 
-    public Task AddReading(int accountId, DateTime readingDate, int readingValue)
+    public Task AddReading(MeterReadingModel model)
     {
         return _sql.SaveData<dynamic>(
-            "[dbo].[spMeterReading_AddReading]",
-            new { accountId, readingDate, readingValue },
+            "[dbo].[spMeterReading_AddMeterReading]",
+            new { accountId = model.AccountId, readingDate = model.ReadingDate, readingValue = model.ReadingValue },
             _connectionStringName);
     }
 }

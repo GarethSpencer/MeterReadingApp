@@ -4,7 +4,7 @@ namespace MeterReadingLibrary.DataAccess;
 
 public interface IStoredProcedureRunner
 {
-    Task AddReading(int accountId, DateTime readingDate, int readingValue);
+    Task AddReading(MeterReadingModel model);
     Task<AccountModel?> GetAccountByAccountId(int accountId);
     Task<List<AccountModel>> GetAllAccounts();
     Task<List<MeterReadingModel>> GetAllReadings();
