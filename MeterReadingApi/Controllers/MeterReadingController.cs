@@ -1,11 +1,11 @@
-﻿using MeterReadingLibrary.DataAccess;
-using Microsoft.AspNetCore.Mvc;
-using CsvHelper;
+﻿using CsvHelper;
 using CsvHelper.Configuration;
-using System.Globalization;
+using MeterReadingApi.Helpers;
+using MeterReadingLibrary.DataAccess;
 using MeterReadingLibrary.Models;
 using MeterReadingLibrary.Validators;
-using MeterReadingApi.Helpers;
+using Microsoft.AspNetCore.Mvc;
+using System.Globalization;
 
 namespace MeterReadingApi.Controllers;
 
@@ -24,43 +24,68 @@ public class MeterReadingController : ControllerBase
 
     // POST api/MeterReading/meter-reading-uploads
     [HttpPost("meter-reading-uploads")]
-    public async Task<ActionResult<LoadResults>> Post([FromBody] string? fileLocation)
+    public async Task<ActionResult<LoadResults>> Post([FromBody] string fileLocation)
     {
-        fileLocation ??= $@"{Directory.GetCurrentDirectory()}\TestFiles\meter-reading.csv";
+        try
+        {
+            List<MeterReadingInputModel> inputRows = GetInputRows(fileLocation);
+            var validator = new MeterReadingValidator(_spRunner);
+            var loadResults = new LoadResults();
+            int rowNumber = 2;
 
-        var results = new LoadResults();
+            foreach (var reading in inputRows)
+            {
+                var validation = await validator.ValidateMeterReading(reading);
+                if (validation.IsValid)
+                {
+                    await _spRunner.AddReading(validation.ValidatedModel!);
+                    loadResults.Successes++;
+                }
+                else
+                {
+                    LogValidationErrors(rowNumber, validation.Errors, loadResults, reading.AccountId ?? string.Empty);
+                    loadResults.Failures++;
+                }
+                rowNumber++;
+            }
+
+            return Ok(loadResults);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "The POST call to MeterReading/meter-reading-uploads has failed.");
+            return BadRequest();
+        }
+    }
+
+    private List<MeterReadingInputModel> GetInputRows(string fileLocation)
+    {
         using var reader = new StreamReader(fileLocation);
         using var csv = new CsvReader(reader, new CsvConfiguration(CultureInfo.InvariantCulture)
         {
             HasHeaderRecord = true,
-            IgnoreBlankLines = true
+            Delimiter = ","
         });
 
         var csvReadings = csv.GetRecords<MeterReadingCsvRow>().ToList();
 
-        var inputRows = csvReadings.Select(x => new MeterReadingInputModel
+        _logger.LogInformation($"The csv File at {fileLocation} has been successfully parsed.");
+
+        return csvReadings.Select(x => new MeterReadingInputModel
         {
             AccountId = x.AccountId,
             ReadingDate = x.ReadingDate,
             ReadingValue = x.ReadingValue
         }).ToList();
+    }
 
-        var validator = new MeterReadingValidator(_spRunner);
-
-        foreach (var reading in inputRows)
+    private void LogValidationErrors(int rowNumber, List<string> errors, LoadResults loadResults, string accountId)
+    {
+        foreach (var error in errors)
         {
-            var validation = await validator.ValidateMeterReading(reading);
-            if (validation.IsValid)
-            {
-                await _spRunner.AddReading(validation.ValidatedModel!);
-                results.Successes++;
-            }
-            else
-            {
-                results.Failures++;
-            }
+            var message = $"Error loading row [{rowNumber}] of the file for AccountId [{accountId}]: {error}";
+            loadResults.ErrorMessages.Add(message);
+            _logger.LogWarning(message);
         }
-
-        return Ok(results);
     }
 }

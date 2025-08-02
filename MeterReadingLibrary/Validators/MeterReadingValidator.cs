@@ -41,7 +41,7 @@ public class MeterReadingValidator
         return result;
     }
 
-    private static int ValidateAccountId(string accountId, List<string> errors)
+    private static int ValidateAccountId(string? accountId, List<string> errors)
     {
         if (!int.TryParse(accountId, out int parsedaccountId))
         {
@@ -51,7 +51,7 @@ public class MeterReadingValidator
         return parsedaccountId;
     }
 
-    private static DateTime ValidateReadingDate(string readingDate, List<string> errors)
+    private static DateTime ValidateReadingDate(string? readingDate, List<string> errors)
     {
         if (!DateTime.TryParse(readingDate, out DateTime parsedreadingDate))
         {
@@ -61,7 +61,7 @@ public class MeterReadingValidator
         return parsedreadingDate;
     }
 
-    private static int ValidateReadingValue(string readingValue, List<string> errors)
+    private static int ValidateReadingValue(string? readingValue, List<string> errors)
     {
         if (!int.TryParse(readingValue, out int parsedreadingValue))
         {
@@ -99,7 +99,7 @@ public class MeterReadingValidator
                 result.Errors.Add("This reading already exists");
                 return;
             }
-            else if (reading.ReadingDate < result.ValidatedModel!.ReadingDate)
+            else if (reading.ReadingDate > result.ValidatedModel!.ReadingDate)
             {
                 result.Errors.Add("This reading is older than an existing read");
                 return;

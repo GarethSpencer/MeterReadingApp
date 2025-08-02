@@ -12,10 +12,12 @@ namespace MeterReadingApi.Controllers;
 public class AuthenticationController : ControllerBase
 {
     private readonly IConfiguration _config;
+    private readonly ILogger<AuthenticationController> _logger;
 
-    public AuthenticationController(IConfiguration config)
+    public AuthenticationController(IConfiguration config, ILogger<AuthenticationController> logger)
     {
         _config = config;
+        _logger = logger;
     }
 
     public record AuthenticationData(string? UserName, string? Password);
@@ -26,16 +28,26 @@ public class AuthenticationController : ControllerBase
     [AllowAnonymous]
     public ActionResult<string> Authenticate([FromBody] AuthenticationData data)
     {
-        var user = ValidateCredentials(data);
-
-        if (user is null)
+        try
         {
-            return Unauthorized();
+            var user = ValidateCredentials(data);
+
+            if (user is null)
+            {
+                _logger.LogWarning($"Unauthorised user [{data.UserName}] has failed authentication");
+                return Unauthorized();
+            }
+
+            var token = GenerateToken(user);
+
+            _logger.LogInformation("Authentication successful! A token has been returned.");
+            return Ok(token);
         }
-
-        var token = GenerateToken(user);
-
-        return Ok(token);
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "The POST call to Authentication/token has failed.");
+            return BadRequest();
+        }
     }
 
     private string GenerateToken(UserData user)
