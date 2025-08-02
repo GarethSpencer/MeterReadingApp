@@ -22,6 +22,16 @@ public class MeterReadingController : ControllerBase
         _logger = logger;
     }
 
+    /// <summary>
+    ///     Takes a .csv file of user meter readings, validates and loads it to a database
+    /// </summary>
+    /// <remarks>
+    ///     Send the file as form-data in the body of the request, with key 'file'.
+    /// </remarks>
+    /// <param name="file"></param>
+    /// <returns>
+    ///     Success and failure volumes, with a list of errors for invalid rows
+    /// </returns>
     // POST api/MeterReading/meter-reading-uploads
     [HttpPost("meter-reading-uploads")]
     public async Task<ActionResult<LoadResults>> Post(IFormFile file)
@@ -64,7 +74,7 @@ public class MeterReadingController : ControllerBase
         }
     }
 
-    private List<MeterReadingInputModel> GetInputRows(IFormFile file)
+    private static List<MeterReadingInputModel> GetInputRows(IFormFile file)
     {
         using var reader = new StreamReader(file.OpenReadStream());
         using var csv = new CsvReader(reader, new CsvConfiguration(CultureInfo.InvariantCulture)
@@ -73,21 +83,21 @@ public class MeterReadingController : ControllerBase
             Delimiter = ","
         });
 
-        var csvReadings = csv.GetRecords<MeterReadingCsvRow>().ToList();
+        var csvReadings = csv.GetRecords<MeterReadingCsvRowModel>().ToList();
 
-        return csvReadings.Select(x => new MeterReadingInputModel
+        return [.. csvReadings.Select(x => new MeterReadingInputModel
         {
             AccountId = x.AccountId,
             ReadingDate = x.ReadingDate,
             ReadingValue = x.ReadingValue
-        }).ToList();
+        })];
     }
 
     private void LogValidationErrors(int rowNumber, List<string> errors, LoadResults loadResults, string accountId)
     {
         foreach (var error in errors)
         {
-            var message = $"Error loading row [{rowNumber}] of the file for AccountId [{accountId}]: {error}";
+            var message = $"Error loading row [{rowNumber}] for AccountId [{accountId}]: {error}";
             loadResults.ErrorMessages.Add(message);
             _logger.LogWarning(message);
         }

@@ -1,6 +1,8 @@
 ﻿using MeterReadingLibrary.DataAccess;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+using System.Reflection;
 using System.Text;
 
 namespace MeterReadingApi.StartupConfig;
@@ -12,7 +14,23 @@ public static class DependencyInjectionExtensions
     {
         builder.Services.AddControllers();
         builder.Services.AddEndpointsApiExplorer();
-        builder.Services.AddSwaggerGen();
+        builder.Services.AddSwaggerGen(opts => 
+        {
+            opts.SwaggerDoc("v1", new OpenApiInfo
+            {
+                Version = "v1",
+                Title = "Ensek Meter Reading API",
+                Description = "A csv file loader that accepts customer meter readings, " +
+                    "validates each row, and loads valid data onto a database.",
+                Contact = new OpenApiContact
+                {
+                    Name = "Gareth Spencer",
+                    Url = new Uri("https://github.com/GarethSpencer/MeterReadingApp")
+                }
+            });
+            var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+            opts.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFile));
+        });
     }
 
     public static void AddAuthServices(this WebApplicationBuilder builder)

@@ -4,7 +4,7 @@ using MeterReadingLibrary.Models;
 using MeterReadingLibrary.Validators;
 using Moq;
 
-namespace MeterReadingLibrary.Tests
+namespace MeterReadingLibrary.Tests.Validators
 {
     public class MeterReadingValidatorTests
     {

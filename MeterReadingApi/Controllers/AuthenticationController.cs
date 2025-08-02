@@ -23,6 +23,17 @@ public class AuthenticationController : ControllerBase
     public record AuthenticationData(string? UserName, string? Password);
     public record UserData(int Id, string UserName);
 
+    /// <summary>
+    ///     Takes user credentials and validates them to ensure they are authorised to post to meter-reading-uploads
+    /// </summary>
+    /// <remarks>
+    ///     Validations will need to be replaced with an auth system before go-live. 
+    ///     Configured with one test user. Username: ensek, Password: Test1!
+    /// </remarks>
+    /// <param name="data"></param>
+    /// <returns>
+    ///     JwtSecurityToken
+    /// </returns>
     // POST api/Authentication/token
     [HttpPost("token")]
     [AllowAnonymous]

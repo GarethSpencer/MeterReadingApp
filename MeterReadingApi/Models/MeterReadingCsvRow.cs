@@ -1,6 +1,6 @@
 ﻿namespace MeterReadingLibrary.Models;
 
-public class MeterReadingCsvRow
+public class MeterReadingCsvRowModel
 {
     public string? AccountId { get; set; }
 
