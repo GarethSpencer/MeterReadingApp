@@ -1,0 +1,76 @@
+﻿@page "/"
+@using System.Net.Http.Json
+@rendermode InteractiveServer
+
+@inject IHttpClientFactory factory
+@inject TokenModel tokenInfo
+
+<PageTitle>Login</PageTitle>
+
+@if (isLoggedIn)
+{
+    <h1>You are Logged In</h1>
+    <button class="btn btn-danger" @onclick="LogOut">Log Out</button>
+}
+else
+{
+    <h1 class="mb-2">Please Log In</h1>
+    @if (loginFailure)
+    {
+        <p class="text-danger">Login Failed</p>
+    }
+
+    <EditForm Model="login" FormName="LoginForm" OnValidSubmit="HandleValidSubmit">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="form-group mb-2">
+            <label for="username">Username</label>
+            <InputText id="username" class="form-control w-50" @bind-Value="login.UserName" />
+        </div>
+
+        <div class="form-group mb-2">
+            <label for="password">Password</label>
+            <InputText id="password" class="form-control w-50" type="password" @bind-Value="login.Password" />
+        </div>
+
+        <button class="btn btn-success" type="submit">Log In</button>
+    </EditForm>
+}
+
+@code {
+    private AuthenticationModel login = new();
+    private bool isLoggedIn = false;
+    private bool loginFailure = false;
+
+    protected override void OnInitialized()
+    {
+        isLoggedIn = !string.IsNullOrWhiteSpace(tokenInfo.Token);
+    }
+
+    private async void HandleValidSubmit()
+    {
+        var client = factory.CreateClient("api");
+        var info = await client.PostAsJsonAsync<AuthenticationModel>("Authentication/token", login);
+
+        if (info.IsSuccessStatusCode)
+        {
+            tokenInfo.Token = await info.Content.ReadAsStringAsync();
+            loginFailure = false;
+            isLoggedIn = true;
+        }
+        else
+        {
+            loginFailure = true;
+            isLoggedIn = false;
+        }
+
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private void LogOut()
+    {
+        isLoggedIn = false;
+        tokenInfo.Token = string.Empty;
+    }
+}

@@ -12,29 +12,53 @@ namespace MeterReadingApi.Controllers;
 public class AuthenticationController : ControllerBase
 {
     private readonly IConfiguration _config;
+    private readonly ILogger<AuthenticationController> _logger;
 
-    public AuthenticationController(IConfiguration config)
+    public AuthenticationController(IConfiguration config, ILogger<AuthenticationController> logger)
     {
         _config = config;
+        _logger = logger;
     }
 
     public record AuthenticationData(string? UserName, string? Password);
     public record UserData(int Id, string UserName);
 
+    /// <summary>
+    ///     Takes user credentials and validates them to ensure they are authorised to post to meter-reading-uploads
+    /// </summary>
+    /// <remarks>
+    ///     Validations will need to be replaced with an auth system before go-live. 
+    ///     Configured with one test user. Username: ensek, Password: Test1!
+    /// </remarks>
+    /// <param name="data"></param>
+    /// <returns>
+    ///     JwtSecurityToken
+    /// </returns>
+    // POST api/Authentication/token
     [HttpPost("token")]
     [AllowAnonymous]
     public ActionResult<string> Authenticate([FromBody] AuthenticationData data)
     {
-        var user = ValidateCredentials(data);
-
-        if (user is null)
+        try
         {
-            return Unauthorized();
+            var user = ValidateCredentials(data);
+
+            if (user is null)
+            {
+                _logger.LogWarning($"Unauthorised user [{data.UserName}] has failed authentication");
+                return Unauthorized();
+            }
+
+            var token = GenerateToken(user);
+
+            _logger.LogInformation("Authentication successful! A token has been returned.");
+            return Ok(token);
         }
-
-        var token = GenerateToken(user);
-
-        return Ok(token);
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "The POST call to Authentication/token has failed.");
+            return BadRequest();
+        }
     }
 
     private string GenerateToken(UserData user)
@@ -61,9 +85,9 @@ public class AuthenticationController : ControllerBase
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
 
-    // NON PRODUCTION VALIDATIONS: Replace this with a call to an auth system (e.g. Auth0)
     private static UserData? ValidateCredentials(AuthenticationData data)
     {
+        // NON PRODUCTION VALIDATIONS: Replace this with a call to an auth system (e.g. Auth0)
         if (CompareValues(data.UserName, "ensek") &&
             CompareValues(data.Password, "Test1!"))
         {

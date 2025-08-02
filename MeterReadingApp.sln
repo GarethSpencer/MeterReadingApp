@@ -1,11 +1,15 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.14.36301.6 d17.14
+VisualStudioVersion = 17.14.36301.6
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MeterReadingLibrary", "MeterReadingLibrary\MeterReadingLibrary.csproj", "{74D8041D-3D5A-4DEE-8C81-2F0E1C572CFE}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MeterReadingApi", "MeterReadingApi\MeterReadingApi.csproj", "{83B55D75-44A3-4C3F-A1F7-054517F3A871}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MeterReadingLibrary.Tests", "MeterReadingLibrary.Tests\MeterReadingLibrary.Tests.csproj", "{04BD3526-7676-497D-9EF7-3C71F51FBE6E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MeterReadingApiClient", "MeterReadingApiClient\MeterReadingApiClient.csproj", "{4FADCD7F-A462-4AB9-926D-5569CAFA60C7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +25,14 @@ Global
 		{83B55D75-44A3-4C3F-A1F7-054517F3A871}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{83B55D75-44A3-4C3F-A1F7-054517F3A871}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{83B55D75-44A3-4C3F-A1F7-054517F3A871}.Release|Any CPU.Build.0 = Release|Any CPU
+		{04BD3526-7676-497D-9EF7-3C71F51FBE6E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{04BD3526-7676-497D-9EF7-3C71F51FBE6E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{04BD3526-7676-497D-9EF7-3C71F51FBE6E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{04BD3526-7676-497D-9EF7-3C71F51FBE6E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4FADCD7F-A462-4AB9-926D-5569CAFA60C7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4FADCD7F-A462-4AB9-926D-5569CAFA60C7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4FADCD7F-A462-4AB9-926D-5569CAFA60C7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4FADCD7F-A462-4AB9-926D-5569CAFA60C7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
