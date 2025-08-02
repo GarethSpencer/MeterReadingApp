@@ -24,11 +24,17 @@ public class MeterReadingController : ControllerBase
 
     // POST api/MeterReading/meter-reading-uploads
     [HttpPost("meter-reading-uploads")]
-    public async Task<ActionResult<LoadResults>> Post([FromBody] string fileLocation)
+    public async Task<ActionResult<LoadResults>> Post(IFormFile file)
     {
         try
         {
-            List<MeterReadingInputModel> inputRows = GetInputRows(fileLocation);
+            if (file == null || file.Length == 0)
+            {
+                _logger.LogError("The POST call to MeterReading/meter-reading-uploads did not contain a file.");
+                return BadRequest("No file uploaded.");
+            }
+
+            List<MeterReadingInputModel> inputRows = GetInputRows(file);
             var validator = new MeterReadingValidator(_spRunner);
             var loadResults = new LoadResults();
             int rowNumber = 2;
@@ -58,9 +64,9 @@ public class MeterReadingController : ControllerBase
         }
     }
 
-    private List<MeterReadingInputModel> GetInputRows(string fileLocation)
+    private List<MeterReadingInputModel> GetInputRows(IFormFile file)
     {
-        using var reader = new StreamReader(fileLocation);
+        using var reader = new StreamReader(file.OpenReadStream());
         using var csv = new CsvReader(reader, new CsvConfiguration(CultureInfo.InvariantCulture)
         {
             HasHeaderRecord = true,
@@ -68,8 +74,6 @@ public class MeterReadingController : ControllerBase
         });
 
         var csvReadings = csv.GetRecords<MeterReadingCsvRow>().ToList();
-
-        _logger.LogInformation($"The csv File at {fileLocation} has been successfully parsed.");
 
         return csvReadings.Select(x => new MeterReadingInputModel
         {
