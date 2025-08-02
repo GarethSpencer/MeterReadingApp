@@ -14,8 +14,40 @@ public static class DependencyInjectionExtensions
     {
         builder.Services.AddControllers();
         builder.Services.AddEndpointsApiExplorer();
-        builder.Services.AddSwaggerGen(opts => 
+        builder.AddSwaggerServices();
+    }
+
+    private static void AddSwaggerServices (this WebApplicationBuilder builder)
+    {
+        var securityScheme = new OpenApiSecurityScheme()
         {
+            Name = "Authorization",
+            Description = "JWT Authorization header info using bearer tokens",
+            In = ParameterLocation.Header,
+            Type = SecuritySchemeType.Http,
+            Scheme = "bearer",
+            BearerFormat = "JWT"
+        };
+
+        var securityRequirement = new OpenApiSecurityRequirement
+        {
+            {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "bearerAuth"
+                }
+            },
+            Array.Empty<string>()
+            }
+        };
+
+        builder.Services.AddSwaggerGen(opts =>
+        {
+            opts.AddSecurityDefinition("bearerAuth", securityScheme);
+            opts.AddSecurityRequirement(securityRequirement);
             opts.SwaggerDoc("v1", new OpenApiInfo
             {
                 Version = "v1",
