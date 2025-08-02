@@ -4,7 +4,7 @@
 
 This API is designed to accepts csv files including these three columns **AccountId** **MeterReadingDateTime** and **MeterReadValue**. Two example files can be found at **MeterReadingApi/TestFiles**.
 
-The API has an optional Blazor Client UI which can be launched alongside the API to provide an alternate user interface, providing the same functionality.
+The API has an optional Blazor Client UI which can be launched alongside the API to provide an alternate user interface, offering the same functionality.
 
 ## Setup
 
@@ -39,4 +39,4 @@ Authentication has been set up and is enforced for the API for one test user:
 
 ***This test user validation is for local development testing only*** 
 
-Before any deployments, this validation *must* be replaced with a call to an reputable authentication platform such as Auth0.
+Before any deployments, this validation *must* be replaced with a call to a reputable authentication platform such as Auth0.
